@@ -1,0 +1,52 @@
+<h1>Advertisements</h1>
+
+<% if flash[:alert] %>
+  <p><%= flash[:alert] %></p>
+<% end %>
+
+<% if current_user %>
+  <%= link_to "Logout", logout_url, class: "btn btn-primary" %>
+  <p>Welcome, <%= current_user.firstName %> <%= current_user.lastName %></p>
+<% else %>
+  <%= link_to "Login", login_path, class: "btn btn-primary" %>
+  <%= link_to "Register", new_user_path, class: "btn btn-primary" %>
+<% end %>
+
+<table>
+  <thead>
+  <tr>
+    <th>Title</th>
+    <th>Body</th>
+    <th>Approved</th>
+    <th>User</th>
+    <% if current_user %>
+      <th>Actions</th>
+    <% end %>
+  </tr>
+  </thead>
+  <tbody>
+  <% @advertisements.each do |advertisement| %>
+    <tr>
+      <td><%= advertisement.title %></td>
+      <td><%= advertisement.body %></td>
+      <td><%= advertisement.isApproved ? 'Yes' : 'No' %></td>
+      <td><%= advertisement.user.firstName %> <%= advertisement.user.lastName %></td>
+      <% if current_user && (advertisement.user == current_user || current_user.isModerator)  %>
+        <td>
+          <%= link_to "Edit", edit_advertisement_path(advertisement), class: "btn btn-primary" %>
+          <%= link_to "Remove", delete_advertisement_path(advertisement), method: :get, data: { confirm: "Are you sure you want to delete this ad?" }, class: "btn btn-danger" %>
+
+        </td>
+      <% end %>
+    </tr>
+  <% end %>
+  </tbody>
+</table>
+
+<% if current_user %>
+  <% if current_user.isModerator %>
+    <%= link_to "Add New Advertisement", new_advertisement_path, class: "btn btn-success" %>
+  <% else %>
+    <%= link_to "Add NewAdvertisement", new_advertisement_path(isApproved: false), class: "btn btn-success" %>
+  <% end %>
+<% end %>
